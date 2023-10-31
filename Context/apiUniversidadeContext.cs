@@ -13,4 +13,5 @@ public class apiUniversidadeContext : DbContext
       public DbSet<Aluno>? Alunos {get; set;}
       public DbSet<Curso>? Cursos {get; set;}
       public DbSet<Disciplina>? Disciplinas {get; set;}
+    
 }
