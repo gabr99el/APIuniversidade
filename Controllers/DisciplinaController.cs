@@ -67,7 +67,7 @@ namespace apiUniversidade.Controllers
             
         }
 
-        [HttpDelete ("{id int}")] 
+        [HttpDelete ("{id:int}")] 
          public ActionResult Delete(int id) {
             var disciplina= _context.Disciplinas.FirstOrDefault (P=> P.Id == id);
 
