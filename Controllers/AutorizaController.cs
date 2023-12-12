@@ -4,6 +4,7 @@ using System.Text;
 using apiUniversidade.DTO;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
 [ApiController]
@@ -12,10 +13,14 @@ using Microsoft.IdentityModel.Tokens;
     {
          private readonly UserManager<IdentityUser> _userManager;
          private readonly SignInManager<IdentityUser> _signInManager;
-         public AutorizaController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
+
+         private readonly IConfiguration _configuration;
+
+         public AutorizaController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, IConfiguration configuration)
          {
             _userManager = userManager;
             _signInManager = signInManager;
+            _configuration = configuration;
          }
 
         [HttpGet]
@@ -37,16 +42,16 @@ using Microsoft.IdentityModel.Tokens;
                 return BadRequest(result.Errors);
             
             await _signInManager.SignInAsync(user, false);
-            return Ok();
+            return Ok(GeraToken(model));
         }
         
         [HttpPost("login")]
-        public async Task<ActionResult> Login([FromBody] UsuarioDTO userinfo){
-            var result = await _signInManager.PasswordSignInAsync(userinfo.Email, userinfo.Password, 
+        public async Task<ActionResult> Login([FromBody] UsuarioDTO userInfo){
+            var result = await _signInManager.PasswordSignInAsync(userInfo.Email, userInfo.Password, 
                     isPersistent: false, lockoutOnFailure: false);
-            
+
             if(result.Succeeded)
-                return Ok();
+                return Ok(GeraToken(userInfo));
             else{
                 ModelState.AddModelError(string.Empty,"Login inválido...");
                 return BadRequest(ModelState);
@@ -81,5 +86,7 @@ using Microsoft.IdentityModel.Tokens;
                 Token = new JwtSecurityTokenHandler().WriteToken(token),
                 Message = "JWT Ok."
             };
+
+            
         }
     }

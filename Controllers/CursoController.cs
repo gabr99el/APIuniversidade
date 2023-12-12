@@ -6,13 +6,14 @@ using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using apiUniversidade.Context;
 using apiUniversidade.Model;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace apiUniversidade.Controllers
 {
-    
+    [Authorize(AuthenticationSchemes = "Bearer")]
     [ApiController]
     [Route("[controller]")]
     public class CursoController : Controller
