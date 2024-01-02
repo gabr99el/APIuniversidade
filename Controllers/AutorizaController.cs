@@ -2,54 +2,55 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using apiUniversidade.DTO;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Configuration;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authorization;
 
-    [ApiController]
-    [Route("[controller]")]
-    public class AutorizaController : Controller
+[ApiController]
+[Route("[controller]")]
+public class AutorizaController : Controller
+{
+    private readonly UserManager<IdentityUser> _userManager;
+    private readonly SignInManager<IdentityUser> _signInManager;
+
+    private readonly IConfiguration _configuration;
+
+    public AutorizaController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, IConfiguration configuration)
     {
-         private readonly UserManager<IdentityUser> _userManager;
-         private readonly SignInManager<IdentityUser> _signInManager;
+        _userManager = userManager;
+        _signInManager = signInManager;
+        _configuration = configuration;
+    }
 
-         private readonly IConfiguration _configuration;
+    [HttpGet]
+    public ActionResult<string> Get(){
+        return "AutorizaController :: Acessado em : "
+            + DateTime.Now.ToLongDateString();
+    }
 
-         public AutorizaController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, IConfiguration configuration)
-         {
-            _userManager = userManager;
-            _signInManager = signInManager;
-            _configuration = configuration;
-         }
+    [HttpPost("register")]
+    public async Task<ActionResult> RegisterUser([FromBody]UsuarioDTO model){
+        var user = new IdentityUser{
+        UserName = model.Email,
+        Email = model.Email,
+        EmailConfirmed = true
+        };
 
-        [HttpGet]
-        public ActionResult<string> Get(){
-            return "AutorizaController :: Acessado em : "
-                + DateTime.Now.ToLongDateString();
-        }
-
-        [HttpPost("register")]
-        public async Task<ActionResult> RegisterUser([FromBody]UsuarioDTO model){
-            var user = new IdentityUser{
-                UserName = model.Email,
-                Email = model.Email,
-                EmailConfirmed = true
-            };
-
-            var result = await _userManager.CreateAsync(user, model.Password);
-            if(!result.Succeeded)
-                return BadRequest(result.Errors);
+        var result = await _userManager.CreateAsync(user, model.Password);
+        if(!result.Succeeded)
+            return BadRequest(result.Errors);
             
-            await _signInManager.SignInAsync(user, false);
-            return Ok(GeraToken(model));
+        await _signInManager.SignInAsync(user, false);
+        return Ok(GeraToken(model));
         }
         
         [HttpPost("login")]
         public async Task<ActionResult> Login([FromBody] UsuarioDTO userInfo){
             var result = await _signInManager.PasswordSignInAsync(userInfo.Email, userInfo.Password, 
-                    isPersistent: false, lockoutOnFailure: false);
+                isPersistent: false, lockoutOnFailure: false);
 
             if(result.Succeeded)
                 return Ok(GeraToken(userInfo));

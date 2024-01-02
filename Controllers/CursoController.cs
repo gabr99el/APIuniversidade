@@ -27,13 +27,10 @@ namespace apiUniversidade.Controllers
             _context = context;
          }
 
-        /*
-        [HttpGet(Name="GetExemplo")]
-        [Route("exemplo")]
-        public String GetExemplo(){
+        public string GetExemplo ()
+        {
             return "Api v1";
         }
-        */
 
         [HttpGet]
         public ActionResult<IEnumerable<Curso>> Get()
