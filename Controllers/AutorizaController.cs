@@ -4,10 +4,11 @@ using System.Text;
 using apiUniversidade.DTO;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
-[ApiController]
+    [ApiController]
     [Route("[controller]")]
     public class AutorizaController : Controller
     {
@@ -65,7 +66,7 @@ using Microsoft.IdentityModel.Tokens;
                 new Claim(Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:key"]));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
 
             var credentials = new SigningCredentials(key,SecurityAlgorithms.HmacSha256);
 
